@@ -1,0 +1,15 @@
+/*
+Enter your query here.
+Please append a semicolon ";" at the end of the query and enter your query in a single line to avoid error.
+*/
+select name 
+from 
+(select
+s.name,
+p.salary,
+(select p1.salary from friends f, packages p1 where f.id = s.id and f.friend_id = p1.id) friend_salary
+from
+students s, packages p
+where s.id = p.id)
+where salary < friend_salary 
+order by friend_salary;
