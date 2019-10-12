@@ -1,0 +1,25 @@
+/*
+Enter your query here.
+Please append a semicolon ";" at the end of the query and enter your query in a single line to avoid error.
+*/
+
+select
+contest_id, hacker_id, name,
+regexp_substr(tot1,'\d+',1,1),
+regexp_substr(tot1,'\d+',1,2),
+regexp_substr(tot2,'\d+',1,1),
+regexp_substr(tot2,'\d+',1,2)
+from 
+(select a.contest_id, a.hacker_id, a.name,
+(select sum(e.total_submissions) || '-' || sum(e.total_accepted_submissions) from colleges b, challenges c, submission_stats e where
+ a.contest_id = b.contest_id and
+b.college_id = c.college_id and
+ e.challenge_id = c.challenge_id) tot1,
+ (select sum(d.total_views) || '-' || sum(d.total_unique_views) from 
+  colleges b, challenges c, view_stats d
+where
+a.contest_id = b.contest_id and
+b.college_id = c.college_id and
+d.challenge_id = c.challenge_id ) tot2
+from contests a) where tot1!='-' or tot2!='-'
+order by contest_id;
