@@ -1,0 +1,12 @@
+/*
+Enter your query here.
+Please append a semicolon ";" at the end of the query and enter your query in a single line to avoid error.
+*/
+select x, y from (select regexp_substr(combo,'\d+',1,1) x, regexp_substr(combo,'\d+',1,2) y from 
+(select distinct case 
+ when a.x <= a.y then a.x || ' ' || a.y 
+ else a.y || ' ' || a.x 
+ end as combo from 
+ (select a.x, a.y, count(*) over (partition by a.x, a.y order by 1) cnt from functions a, functions b where a.x = b.y and b.x = a.y) a where (a.x!=a.y or (a.x=a.y and a.cnt=4))
+)
+                 ) order by to_number(x);
