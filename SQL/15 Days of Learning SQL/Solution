@@ -1,0 +1,22 @@
+select submission_date, totlSubmittedEveryPriorDay, hacker_id, name
+from(
+select 
+submission_date, 
+hacker_id,
+name,
+sum(submittedEveryPriorDay) over (partition by submission_date order by 1) totlSubmittedEveryPriorDay,
+row_number() over (partition by submission_date order by totl_per_day desc , hacker_id) as first from
+(select 
+hacker_id, name, submission_date, 
+ totl_per_day,
+decode(count(submission_date) over (partition by hacker_id order by submission_date range numtodsinterval(15,'DAY') preceding), (submission_date - to_date('2016-03-01','yyyy-MM-dd') + 1),1,0)
+submittedEveryPriorDay
+from 
+(select h.hacker_id, h.name, s.submission_date, count(1) totl_per_day
+from
+hackers h, submissions s 
+ where h.hacker_id = s.hacker_id
+group by h.hacker_id, h.name, s.submission_date 
+)
+)
+) where first = 1 order by submission_date;
