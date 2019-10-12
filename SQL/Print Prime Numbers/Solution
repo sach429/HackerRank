@@ -1,0 +1,12 @@
+/*
+Enter your query here.
+Please append a semicolon ";" at the end of the query and enter your query in a single line to avoid error.
+*/
+select listagg(num,'&') WITHIN GROUP (order by num) from 
+(select 2 num from dual 
+ union 
+ select num from 
+ (select A.num, B.fact, DECODE(REMAINDER(A.NUM, B.FACT),0,1,0) rem from 
+  (select level+1 num from dual connect by level < 1000 order by level) A,  
+  (select level+1 fact from dual connect by level < 1000 order by level) B 
+  where B.fact < A.num) group by num having max(rem) = 0 order by num);
