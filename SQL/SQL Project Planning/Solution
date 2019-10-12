@@ -1,0 +1,14 @@
+/*
+Enter your query here.
+Please append a semicolon ";" at the end of the query and enter your query in a single line to avoid error.
+*/
+select
+root, end_date
+from (
+    select min(root) root, end_date from 
+(select start_date, end_date, connect_by_root start_date as root, connect_by_isleaf leaf from projects
+connect by
+start_date = prior end_date)
+where leaf = 1 
+group by end_date)
+order by (end_date - root), root;
