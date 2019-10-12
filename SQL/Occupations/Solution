@@ -1,0 +1,29 @@
+/*
+Enter your query here.
+Please append a semicolon ";" at the end of the query and enter your query in a single line to avoid error.
+*/
+select  name
+from (select max(name) as name from (select sys_connect_by_path(COALESCE(name,'NULL'),' ') as name , lvl from (select A.name, B.lvl, B.occup from (select name, ordr, occup, occupation from (select name, occupation,
+                    case occupation 
+                    when 'Doctor' then 1 
+                    when 'Professor' then 2 
+                    when 'Singer' then 3 
+                    when 'Actor' then 4 
+                end as occup ,
+                ROW_NUMBER() over(partition by occupation order by name) as ordr 
+                  from occupations) order by ordr, occup) A RIGHT JOIN
+                  (select occupation, lvl, occup from (select distinct occupation,
+                    case occupation 
+                    when 'Doctor' then 1 
+                    when 'Professor' then 2 
+                    when 'Singer' then 3 
+                    when 'Actor' then 4 
+                end as occup from occupations),
+                    (select LEVEL as lvl from 
+                        (select max(cnt) as cnt from 
+                            (select count(1) as cnt from occupations group by occupation)
+                        )
+                connect by level<= cnt)
+             )  B ON A.occupation = B.occupation and A.ordr = B.lvl order by B.lvl, B.occup) 
+             start with occup = 1 
+             connect by lvl = prior lvl and occup = prior occup + 1) group by lvl order by lvl) ;
