@@ -1,0 +1,14 @@
+/*
+Enter your query here.
+Please append a semicolon ";" at the end of the query and enter your query in a single line to avoid error.
+*/
+select N,
+    case
+        when CONNECT_BY_ISLEAF = 1 then 'Leaf'
+        when CONNECT_BY_ROOT N  = N then 'Root'
+        else 'Inner'
+    end
+from BST
+start with P is NULL
+connect by P = prior N
+order by N;
